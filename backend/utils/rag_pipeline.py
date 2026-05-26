@@ -1,11 +1,17 @@
 from typing import Dict, Any, List
-from langsmith import traceable
 from utils.query_optimizer import optimize_query
 from utils.embeddings import generate_query_embedding
 from utils.vectordb import semantic_search
 from utils.hybrid_search import perform_hybrid_search
 from utils.reranker import rerank_chunks
 from utils.groq_helper import generate_answer
+
+# LangSmith tracing is temporarily disabled to prevent memory overhead on free tier.
+# We define a local no-op decorator to avoid breaking pipeline instrumentation.
+def traceable(*args, **kwargs):
+    def decorator(func):
+        return func
+    return decorator
 
 @traceable(name="advanced_rag_pipeline")
 def run_pipeline(user_query: str) -> Dict[str, Any]:

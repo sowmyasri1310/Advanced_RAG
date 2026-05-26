@@ -8,22 +8,24 @@ services:
     dockerContext: .
     plan: free
     # Render injects $PORT automatically; uvicorn must use it
-    # (already handled in the Dockerfile CMD)
     envVars:
       - key: GROQ_API_KEY
         sync: false          # Enter manually in Render dashboard
       - key: LANGSMITH_API_KEY
         sync: false
       - key: LANGSMITH_TRACING
-        value: "true"
+        value: "false"      # Disabled to prevent memory overhead on free tier
       - key: LANGSMITH_ENDPOINT
         value: "https://api.smith.langchain.com"
       - key: LANGSMITH_PROJECT
         value: "Advanced_RAG"
       - key: ALLOWED_ORIGINS
         # Set this to your Vercel frontend URL after deploying frontend
-        # e.g. https://advanced-rag-abc123.vercel.app
         sync: false
+      - key: OMP_NUM_THREADS
+        value: "1"          # Limits PyTorch multithreading to fit in 512MB RAM
+      - key: TOKENIZERS_PARALLELISM
+        value: "false"      # Prevents warning and memory overhead from parallelized tokenizers
     # Persistent disk keeps ChromaDB data between deploys
     disk:
       name: chroma-persistent-storage

@@ -11,7 +11,7 @@ def get_embedding_model():
     global _model
     if _model is None:
         # Load the model only once
-        _model = SentenceTransformer('all-MiniLM-L6-v2')
+        _model = SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L3-v2')
     return _model
 
 def generate_embeddings(texts: List[str]) -> List[List[float]]:

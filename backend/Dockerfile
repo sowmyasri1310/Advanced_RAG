@@ -9,19 +9,34 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
+# Copy requirements.txt first
 COPY requirements.txt .
+
+# Install CPU-only PyTorch first to strictly prevent CUDA/NVIDIA packages from installing
+RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu torch
+
+# Install remaining Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Pre-download AI models during build to avoid cold-start delays
-# This bakes the models into the image so first request is fast
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
-RUN python -c "from sentence_transformers import CrossEncoder; CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')"
+# Pre-download the optimized lightweight embedding model during build time
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L3-v2')"
 
+# Copy application source code
 COPY . .
 
 # Create directories that must exist at runtime
 RUN mkdir -p /app/chroma_db /app/uploads
+
+# Configure environment variables to restrict multithreading, prevent CUDA checks, and save memory
+ENV OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    VECLIB_MAXIMUM_THREADS=1 \
+    NUMEXPR_NUM_THREADS=1 \
+    TOKENIZERS_PARALLELISM=false \
+    TORCH_CUDA_ARCH_LIST="" \
+    FORCE_CUDA="0" \
+    PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 

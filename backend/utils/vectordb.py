@@ -10,7 +10,10 @@ _client = None
 def get_chroma_client():
     global _client
     if _client is None:
-        _client = chromadb.PersistentClient(path=DB_PATH)
+        _client = chromadb.PersistentClient(
+            path=DB_PATH,
+            settings=chromadb.Settings(anonymized_telemetry=False)
+        )
     return _client
 
 def get_or_create_collection():

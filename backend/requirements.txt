@@ -1,12 +1,12 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+sentence-transformers
 fastapi
 uvicorn[standard]
 python-multipart
 PyPDF2
-sentence-transformers
 rank-bm25
 groq
 python-dotenv
-langchain-core
-langsmith
 pydantic
 chromadb

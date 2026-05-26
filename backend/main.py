@@ -4,13 +4,26 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
 
+from contextlib import asynccontextmanager
+
 from utils.pdf_loader import extract_text_and_metadata_from_pdf
 from utils.chunking import chunk_text
-from utils.embeddings import generate_embeddings
+from utils.embeddings import generate_embeddings, get_embedding_model
 from utils.vectordb import insert_chunks, clear_db, get_unique_filenames, delete_document
 from utils.rag_pipeline import run_pipeline
 
-app = FastAPI(title="Advanced RAG API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Pre-load the embedding model singleton in memory during startup
+    print("Pre-loading SentenceTransformer model during startup...")
+    try:
+        get_embedding_model()
+        print("Embedding model pre-loaded successfully!")
+    except Exception as e:
+        print(f"Error pre-loading embedding model: {e}")
+    yield
+
+app = FastAPI(title="Advanced RAG API", lifespan=lifespan)
 
 # Configure CORS for Next.js frontend
 # Add your Vercel domain to ALLOWED_ORIGINS when deploying
