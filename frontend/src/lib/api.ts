@@ -1,17 +1,10 @@
 import axios from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
-
-if (!baseURL && typeof window !== 'undefined') {
-  console.warn(
-    "⚠️ WARNING: NEXT_PUBLIC_API_URL environment variable is not defined! " +
-    "The frontend is attempting to call relative routes, which will result in 404 errors. " +
-    "Please define NEXT_PUBLIC_API_URL in your Vercel Dashboard pointing to your Render backend (e.g., https://your-app.onrender.com) and trigger a redeploy."
-  );
-}
+// Default to the live Render backend URL if NEXT_PUBLIC_API_URL environment variable is not defined
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://advanced-rag-backend-00he.onrender.com';
 
 const api = axios.create({
-  baseURL: baseURL || 'http://localhost:8000', 
+  baseURL: baseURL,
 });
 
 export const uploadDocuments = async (files: File[]) => {
