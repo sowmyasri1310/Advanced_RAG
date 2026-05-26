@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: advanced-rag-backend
+    runtime: docker
+    # Uses the Dockerfile in the backend/ directory
+    dockerfilePath: ./Dockerfile
+    # All paths relative to where render.yaml lives (backend/)
+    dockerContext: .
+    plan: free
+    # Render injects $PORT automatically; uvicorn must use it
+    # (already handled in the Dockerfile CMD)
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # Enter manually in Render dashboard
+      - key: LANGSMITH_API_KEY
+        sync: false
+      - key: LANGSMITH_TRACING
+        value: "true"
+      - key: LANGSMITH_ENDPOINT
+        value: "https://api.smith.langchain.com"
+      - key: LANGSMITH_PROJECT
+        value: "Advanced_RAG"
+      - key: ALLOWED_ORIGINS
+        # Set this to your Vercel frontend URL after deploying frontend
+        # e.g. https://advanced-rag-abc123.vercel.app
+        sync: false
+    # Persistent disk keeps ChromaDB data between deploys
+    disk:
+      name: chroma-persistent-storage
+      mountPath: /app/chroma_db
+      sizeGB: 1
