@@ -1,4 +1,13 @@
-node_modules
-.next
-frontend/node_modules
-frontend/.next
+# Ignore all backend code, virtual environments, databases, and uploads from Vercel upload
+backend/
+backend/venv/
+backend/chroma_db/
+backend/uploads/
+backend/__pycache__/
+backend/*.pyc
+
+# Ignore root-level and frontend development folders
+node_modules/
+.next/
+frontend/node_modules/
+frontend/.next/

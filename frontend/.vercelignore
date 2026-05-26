@@ -1,0 +1,6 @@
+# Ignore local Next.js development dependencies and build caches
+node_modules/
+.next/
+.env.local
+.env.production
+.env
